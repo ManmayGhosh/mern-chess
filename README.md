@@ -5,6 +5,9 @@ moves (via [chess.js](https://github.com/jhlywa/chess.js)), the client
 predicts your own moves instantly, and completed games are logged to
 MongoDB. Built as **M**ongoDB, **E**xpress, **R**eact, **N**ode.
 
+**[Live demo](https://mern-chess-jj10.onrender.com)**
+---
+
 ## Project layout
 
 ```
@@ -51,8 +54,6 @@ npm install
 npm run dev
 ```
 
-Open the Vite dev URL (usually **http://localhost:5173**) in two tabs.
-
 ## How it works
 
 **Server is the sole authority on legal moves (`server/server.js`)**
@@ -90,24 +91,14 @@ Live game state stays in server memory (a single `Chess` instance per
 room) — there's nothing to gain from putting that in a database. Mongo
 instead persists finished games: start/end time, full SAN move list,
 PGN, and result (checkmate/stalemate/draw/disconnect). `GET /api/games`
-serves the last 20 for the `GameHistory` component to display. This is
-the natural split for any realtime game backend: durable history in the
-database, hot authoritative state in memory.
+serves the last 20 for the `GameHistory` component to display.
 
-## Known limitations / good next steps
-
-- **Single room.** All connections share one game; a 3rd connection is
-  rejected. Multiple concurrent games would need a room/matchmaking
-  layer.
+## limitations
 - **No reconnection to an in-progress game.** If a player disconnects
   mid-game, the game is logged as a disconnect-forfeit and the board
   resets — there's no session/auth to let them resume the same seat.
 - **No clocks.** Real chess servers sync per-player time budgets, which
   is its own interesting sync problem (server-authoritative clock
   ticking down, paused on the opponent's turn, resolved on flag-fall)
-  — a natural extension if you want more of the original "netcode under
-  lag" flavor.
 - **No player accounts.** Colors are assigned by connection order, not
-  by identity. Add an Express auth route + a `User` model to support that.
-- **No spectators.** Rejecting a 3rd connection is the simplest option
-  ("full") rather than a fan-out spectator mode.
+  by identity.
